@@ -2,7 +2,6 @@
 
 import torch.nn as nn
 
-
 class First2D(nn.Module):
     def __init__(self, in_channels, middle_channels, out_channels, dropout=False):
         super(First2D, self).__init__()
@@ -121,4 +120,3 @@ class Last2D(nn.Module):
 
     def forward(self, x):
         return self.first(x)
-

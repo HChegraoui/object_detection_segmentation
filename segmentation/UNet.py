@@ -187,8 +187,8 @@ class UNet(nn.Module):
             y_out = self(X_batch, bbox=bbox_batch)
             val_loss = self.loss(y_out, y_batch)
             running_val_loss += val_loss.item()
-            metrics_dic['mean_loss'] += running_val_loss
-            for key, val in classwise_metrics(y_out, y_batch).items():
+            metrics_dic['mean_loss'] = running_val_loss
+            for key, val in classwise_metrics(y_out, y_batch, self.device).items():
                 metrics_dic[key] += val
         del X_batch, y_batch
 

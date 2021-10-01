@@ -2,11 +2,11 @@ import torch
 from torch.autograd import Variable
 
 
-def classwise_metrics(output_, gt):
+def classwise_metrics(output_, gt, device):
     epsilon = 1e-20
     n_classes = output_.shape[1]
     if (n_classes == 1):
-        t = Variable(torch.Tensor([0.5]))  # threshold
+        t = Variable(torch.Tensor([0.5]).to(device))  # threshold
         output_ = (output_ > t).float() * 1
         start = 1
     else:
