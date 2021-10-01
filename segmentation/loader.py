@@ -5,8 +5,7 @@ import numpy as np
 import torch
 from skimage import io
 from torch.utils.data import Dataset
-from torchvision import transforms \
-    as T
+from torchvision import transforms as T
 
 
 def to_long_tensor(pic):
@@ -30,7 +29,7 @@ def correct_dims(*images):
         return corr_images
 
 
-class ImageToImage2D(Dataset):
+class DatasetLoader(Dataset):
 
     def __init__(self, dataset_path: str, joint_transform: Callable = None, one_hot_mask: int = False,
                  use_bbox: bool = True) -> None:
@@ -47,7 +46,7 @@ class ImageToImage2D(Dataset):
             self.joint_transform = joint_transform
         else:
             to_tensor = T.ToTensor()
-            #self.joint_transform = lambda x, y, z: (to_tensor(x), to_tensor(y), to_tensor(z))
+            # self.joint_transform = lambda x, y, z: (to_tensor(x), to_tensor(y), to_tensor(z))
             self.joint_transform = lambda *xs: tuple([to_tensor(x) for x in xs])
 
     def __len__(self):
@@ -62,26 +61,23 @@ class ImageToImage2D(Dataset):
         mask_ = io.imread(os.path.join(self.output_path, image_filename))
         mask = np.zeros((mask_.shape[0], mask_.shape[1]))
         mask[:, :] = mask_ != 0
-        mask = mask.astype(np.uint8)
-
+        mask = mask.astype(np.float32)
         if (self.use_bbox):
             bbox = io.imread(os.path.join(self.bbox_path, image_filename))
-            bbox = bbox.astype(np.uint8)
+            bbox = bbox.astype(np.float32)
         # correct dimensions if needed
         if (self.use_bbox):
             image, mask, bbox = correct_dims(image, mask, bbox)
         else:
             image, mask = correct_dims(image, mask)
-
         if self.joint_transform:
             if (self.use_bbox):
                 image, mask, bbox = self.joint_transform(image, mask, bbox)
             else:
                 image, mask = self.joint_transform(image, mask)
-
         if self.one_hot_mask:
             assert self.one_hot_mask > 0, 'one_hot_mask must be nonnegative'
             mask = torch.zeros((self.one_hot_mask, mask.shape[1], mask.shape[2])).scatter_(0, mask.long(), 1)
-        if(self.use_bbox):
+        if (self.use_bbox):
             return image, mask, bbox, image_filename
         return image, mask, image_filename
