@@ -10,7 +10,7 @@ from utils.general import non_max_suppression, scale_coords
 from utils.torch_utils import select_device
 
 
-class TumorDetector(object):
+class YOLODetector(object):
 
     def __init__(self, weights, img_size=512, conf_thres=0.3, post_process=False, kernel_size=7):
         self.device = select_device()
@@ -22,7 +22,6 @@ class TumorDetector(object):
 
     def detect(self, input_nib):
         input_mat = input_nib.get_fdata()
-        t0 = time()
         mask = np.zeros(input_nib.shape)
 
         imgs = self.prepare_image(input_mat)
